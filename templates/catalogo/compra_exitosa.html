@@ -1,0 +1,27 @@
+<!-- compra_exitosa.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compra Exitosa</title>
+    <script>
+        window.onload = function() {
+            // Redirigir al home después de 2 segundos
+            setTimeout(function() {
+                window.location.href = "{% url 'home' %}";
+            }, 2000);
+            
+            // Iniciar descarga del PDF
+            var link = document.createElement('a');
+            link.href = "{% url 'descargar_comprobante' %}";
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    </script>
+</head>
+<body>
+    <h1>¡Compra realizada con éxito!</h1>
+    <p>Tu comprobante se descargará automáticamente. Serás redirigido al inicio en 2 segundos...</p>
+</body>
+</html>

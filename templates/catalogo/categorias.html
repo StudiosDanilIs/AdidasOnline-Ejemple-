@@ -1,0 +1,237 @@
+{% extends 'catalogo/base.html' %} {% load static %} {% block content %}
+
+<!-- Carrusel de imágenes -->
+<div class="carrusel">
+  <img src="{% static 'images/fondo_index.png' %}" alt="Carrusel 1" />
+  <div class="texto-carrusel">
+    <h2>Todos Nuestros Productos</h2>
+    <p>Zapatos Deportivos, Casuales y Cómodos.</p>
+    <a href="#mostrador" class="btn">Explorar Productos</a>
+  </div>
+</div>
+
+<!-- Sección de Productos -->
+<div id="productos" class="seccion-productos">
+  <h2>Nuestros Productos</h2>
+  <p>Descubre nuestra amplia variedad de zapatos.</p>
+  <div class="productos-grid">
+    {% for producto in productos %}
+    <div class="producto">
+      <div class="contenedor-imagen">
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" />
+        {% if producto.precio_anterior %}
+        <span class="etiqueta-descuento">Descuento</span>
+        {% endif %}
+      </div>
+      <h3 id="nombre">{{ producto.nombre }}</h3>
+      <p id="descripcion">{{ producto.descripcion }}</p>
+      <div class="precios">
+        <p class="precio-actual">${{ producto.precio_actual }}</p>
+        {% if producto.precio_anterior %}
+        <p class="precio-anterior tachado">${{ producto.precio_anterior }}</p>
+        {% endif %}
+      </div>
+      <button
+        class="ver-mas"
+        data-id="{{ producto.id }}"
+        data-nombre="{{ producto.nombre }}"
+        data-descripcion="{{ producto.descripcion }}"
+        data-precio="{{ producto.precio_actual }}"
+        data-talla-min="{{ producto.talla_min }}"
+        data-talla-max="{{ producto.talla_max }}"
+        data-imagen1="{% if producto.imagen1 %}{{ producto.imagen1.url }}{% else %}#{% endif %}"
+        data-imagen2="{% if producto.imagen2 %}{{ producto.imagen2.url }}{% else %}#{% endif %}"
+        data-imagen3="{% if producto.imagen3 %}{{ producto.imagen3.url }}{% else %}#{% endif %}"
+        data-imagen4="{% if producto.imagen4 %}{{ producto.imagen4.url }}{% else %}#{% endif %}"
+      >
+        Ver más fotos
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Modal para más imágenes y agregar al carrito -->
+<div id="modal-imagenes" class="modal hidden">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div class="modal-container">
+      <div class="modal-images">
+        <button class="arrow prev">&larr;</button>
+        <button class="arrow next">&rarr;</button>
+        <div class="imagenes-container">
+          <img src="" alt="Imagen 1" class="active" />
+          <img src="" alt="Imagen 2" />
+          <img src="" alt="Imagen 3" />
+          <img src="" alt="Imagen 4" />
+        </div>
+      </div>
+      <div class="modal-info">
+        <h2 id="modal-titulo"></h2>
+        <p id="modal-descripcion"></p>
+        <p id="modal-precio"></p>
+        <form id="form-agregar-carrito" method="post">
+          {% csrf_token %}
+          <input type="hidden" id="producto-id" name="producto_id" value="" />
+          <div class="form-group">
+            <label for="talla">Selecciona tu talla:</label>
+            <select id="talla" name="talla" class="form-control" required>
+              <!-- Las opciones de talla se llenarán dinámicamente con JavaScript -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cantidad">Cantidad:</label>
+            <input
+              type="number"
+              id="cantidad"
+              name="cantidad"
+              min="1"
+              value="1"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-agregar-carrito">
+            Agregar al Carrito
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script para manejar el modal, las imágenes y el carrito -->
+<script>
+  // Abrir modal al hacer clic en "Ver más fotos"
+  document.querySelectorAll(".ver-mas").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modal = document.getElementById("modal-imagenes");
+      const modalTitulo = document.getElementById("modal-titulo");
+      const modalDescripcion = document.getElementById("modal-descripcion");
+      const modalPrecio = document.getElementById("modal-precio");
+      const productoIdInput = document.getElementById("producto-id"); // Campo oculto
+      const tallaSelect = document.getElementById("talla");
+      const imagenes = document.querySelectorAll(".imagenes-container img");
+
+      // Obtener los datos del producto
+      const nombreProducto = button.getAttribute("data-nombre");
+      const descripcionProducto = button.getAttribute("data-descripcion");
+      const precioProducto = button.getAttribute("data-precio");
+      const tallaMin = parseInt(button.getAttribute("data-talla-min"));
+      const tallaMax = parseInt(button.getAttribute("data-talla-max"));
+      const productoId = button.getAttribute("data-id");
+      const imagen1 = button.getAttribute("data-imagen1");
+      const imagen2 = button.getAttribute("data-imagen2");
+      const imagen3 = button.getAttribute("data-imagen3");
+      const imagen4 = button.getAttribute("data-imagen4");
+
+      // Actualizar el contenido del modal
+      modalTitulo.textContent = nombreProducto;
+      modalDescripcion.textContent = descripcionProducto;
+      modalPrecio.textContent = `Precio: $${precioProducto}`;
+      productoIdInput.value = productoId; // Actualizar el ID del producto
+
+      // Llenar las opciones de talla
+      tallaSelect.innerHTML = ""; // Limpiar opciones anteriores
+      for (let talla = tallaMin; talla <= tallaMax; talla++) {
+        const option = document.createElement("option");
+        option.value = talla;
+        option.textContent = talla;
+        tallaSelect.appendChild(option);
+      }
+
+      // Actualizar las imágenes del modal
+      imagenes[0].src = imagen1;
+      imagenes[1].src = imagen2;
+      imagenes[2].src = imagen3;
+      imagenes[3].src = imagen4;
+
+      // Mostrar el modal
+      modal.classList.remove("hidden");
+      modal.classList.add("visible");
+    });
+  });
+
+  // Cerrar modal al hacer clic en la "X"
+  document.querySelector(".modal .close").addEventListener("click", () => {
+    const modal = document.getElementById("modal-imagenes");
+    modal.classList.remove("visible");
+    modal.classList.add("hidden");
+  });
+
+  // Cerrar modal al hacer clic fuera del contenido
+  window.addEventListener("click", (event) => {
+    const modal = document.getElementById("modal-imagenes");
+    if (event.target === modal) {
+      modal.classList.remove("visible");
+      modal.classList.add("hidden");
+    }
+  });
+
+  // Cambiar imágenes con flechas
+  document.querySelectorAll(".arrow").forEach((arrow) => {
+    arrow.addEventListener("click", () => {
+      const images = document.querySelectorAll(".imagenes-container img");
+      let activeIndex = -1;
+
+      // Encontrar la imagen activa
+      images.forEach((img, index) => {
+        if (img.classList.contains("active")) {
+          activeIndex = index;
+          img.classList.remove("active");
+        }
+      });
+
+      // Calcular la siguiente imagen
+      if (arrow.classList.contains("prev")) {
+        activeIndex = (activeIndex - 1 + images.length) % images.length;
+      } else if (arrow.classList.contains("next")) {
+        activeIndex = (activeIndex + 1) % images.length;
+      }
+
+      // Activar la nueva imagen
+      images[activeIndex].classList.add("active");
+    });
+  });
+
+  // Manejar el formulario de agregar al carrito
+  document
+    .getElementById("form-agregar-carrito")
+    .addEventListener("submit", function (e) {
+      e.preventDefault(); // Evitar el envío tradicional del formulario
+
+      const productoId = document.getElementById("producto-id").value; // Obtener el ID del producto
+      const formData = new FormData(this);
+
+      // Construir la URL dinámicamente
+      const url = "{% url 'agregar_al_carrito' 0 %}".replace('0', productoId);
+
+      fetch(url, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": formData.get("csrfmiddlewaretoken"), // Incluir el token CSRF
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Producto agregado al carrito");
+            // Cerrar el modal después de agregar al carrito
+            document
+              .getElementById("modal-imagenes")
+              .classList.remove("visible");
+            document.getElementById("modal-imagenes").classList.add("hidden");
+          } else {
+            alert("Error al agregar el producto al carrito");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+</script>
+
+{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/styles_catalogo.css' %}?v=1.0" />
+{% endblock %}

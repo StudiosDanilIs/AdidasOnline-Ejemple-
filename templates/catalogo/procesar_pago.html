@@ -1,0 +1,414 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'images/logo.ico' %}" type="image/x-icon">
+    <title>Finalizar Compra - Adidas</title>
+    <style>
+        :root {
+            --primary-color: #006cff;
+            --secondary-color: #2d3748;
+            --success-color: #48bb78;
+            --error-color: #e53e3e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1rem;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 640px;
+            padding: 2.5rem;
+            margin: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-title {
+            color: var(--secondary-color);
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .method-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            text-align: center;
+        }
+
+        .method-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .method-card.active {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+        }
+
+        .method-logo {
+            height: 40px;
+            margin: 0 auto 0.5rem;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+
+        .method-card.active .method-logo {
+            filter: grayscale(0%);
+        }
+
+        .payment-form {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .payment-form.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 90%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 108, 255, 0.1);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background: #f0fff4;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .payment-container {
+                padding: 1.5rem;
+            }
+            
+            .payment-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1 class="payment-title">Finalizar Compra</h1>
+            {% if messages %}
+            <div class="alert-messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="payment-methods">
+            <div class="method-card" data-method="paypal">
+                <img src="{% static 'images/paypal.png' %}" alt="PayPal" class="method-logo">
+            </div>
+            <div class="method-card" data-method="visa">
+                <img src="{% static 'images/visa.png' %}" alt="Visa" class="method-logo">
+            </div>
+            <div class="method-card" data-method="mastercard">
+                <img src="{% static 'images/mastercard.png' %}" alt="Mastercard" class="method-logo">
+            </div>
+            <div class="method-card" data-method="maestro">
+                <img src="{% static 'images/maestro.png' %}" alt="Maestro" class="method-logo">
+            </div>
+        </div>
+
+        <!-- Formulario PayPal -->
+        <form id="paypalForm" class="payment-form" method="POST" action="{% url 'completar_compra' %}">
+            {% csrf_token %}
+            <input type="hidden" name="metodo_pago" value="paypal">
+            
+            <div class="form-group">
+                <label class="form-label">Correo de PayPal</label>
+                <input type="email" name="email" class="form-input" required>
+                <div class="error-message">Ingrese un email válido</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Dirección de Entrega</label>
+                <input type="text" name="direccion" 
+                       class="form-input"
+                       placeholder="Ej: Av. Principal 123, Ciudad"
+                       required>
+                <div class="error-message">Este campo es requerido</div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Pagar ${{ total|floatformat:2 }}
+            </button>
+        </form>
+
+        <!-- Formulario para Tarjetas -->
+        <form id="cardForm" class="payment-form" method="POST" action="{% url 'completar_compra' %}">
+            {% csrf_token %}
+            <input type="hidden" name="metodo_pago" value="tarjeta">
+            
+            <div class="form-group">
+                <label class="form-label">Número de Tarjeta</label>
+                <input type="text" name="cardNumber" 
+                       class="form-input"
+                       placeholder="0000 0000 0000 0000"
+                       required>
+                <div class="error-message">Número inválido</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Titular de la Tarjeta</label>
+                <input type="text" name="cardName" 
+                       class="form-input"
+                       placeholder="Nombre completo"
+                       required>
+                <div class="error-message">Nombre requerido</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Dirección de Entrega</label>
+                <input type="text" name="direccion" 
+                       class="form-input"
+                       placeholder="Ej: Av. Principal 123, Ciudad"
+                       required>
+                <div class="error-message">Este campo es requerido</div>
+            </div>
+
+            <div class="form-group grid-columns">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label class="form-label">Expiración</label>
+                        <input type="text" name="expiryDate" 
+                               class="form-input"
+                               placeholder="MM/AA"
+                               required>
+                        <div class="error-message">Fecha inválida</div>
+                    </div>
+                    <div>
+                        <label class="form-label">CVV</label>
+                        <input type="text" name="cvv" 
+                               class="form-input"
+                               placeholder="123"
+                               required>
+                        <div class="error-message">Código inválido</div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Pagar ${{ total|floatformat:2 }}
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Sistema de pagos mejorado
+        class PaymentSystem {
+            constructor() {
+                this.methodCards = document.querySelectorAll('.method-card');
+                this.forms = {
+                    paypal: document.getElementById('paypalForm'),
+                    visa: document.getElementById('cardForm'),
+                    mastercard: document.getElementById('cardForm'),
+                    maestro: document.getElementById('cardForm')
+                };
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupInputFormatting();
+            }
+
+            setupEventListeners() {
+                this.methodCards.forEach(card => {
+                    card.addEventListener('click', () => this.selectMethod(card));
+                });
+
+                document.querySelectorAll('form').forEach(form => {
+                    form.addEventListener('submit', (e) => this.handleSubmit(e));
+                });
+            }
+
+            selectMethod(card) {
+                this.methodCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                const method = card.dataset.method;
+                Object.values(this.forms).forEach(form => form.classList.remove('active'));
+                this.forms[method].classList.add('active');
+            }
+
+            setupInputFormatting() {
+                const cardNumberInput = document.querySelector('[name="cardNumber"]');
+                if (cardNumberInput) {
+                    cardNumberInput.addEventListener('input', (e) => {
+                        e.target.value = e.target.value
+                            .replace(/\D/g, '')
+                            .replace(/(\d{4})(?=\d)/g, '$1 ')
+                            .substring(0, 19);
+                    });
+                }
+
+                const expiryInput = document.querySelector('[name="expiryDate"]');
+                if (expiryInput) {
+                    expiryInput.addEventListener('input', (e) => {
+                        e.target.value = e.target.value
+                            .replace(/^(\d\d)(\d)/, '$1/$2')
+                            .replace(/[^\d/]/g, '')
+                            .substring(0, 5);
+                    });
+                }
+
+                const cvvInput = document.querySelector('[name="cvv"]');
+                if (cvvInput) {
+                    cvvInput.addEventListener('input', (e) => {
+                        e.target.value = e.target.value
+                            .replace(/\D/g, '')
+                            .substring(0, 3);
+                    });
+                }
+            }
+
+            handleSubmit(event) {
+                event.preventDefault();
+                const form = event.target;
+                
+                if (this.validateForm(form)) {
+                    form.submit();
+                }
+            }
+
+            validateForm(form) {
+                let isValid = true;
+                const fields = form.querySelectorAll('[required]');
+                
+                fields.forEach(field => {
+                    const error = field.parentElement.querySelector('.error-message');
+                    
+                    if (!field.checkValidity()) {
+                        this.showError(field, error);
+                        isValid = false;
+                    } else {
+                        this.hideError(error);
+                    }
+
+                    if (field.name === 'email' && !this.validateEmail(field.value)) {
+                        this.showError(field, error);
+                        isValid = false;
+                    }
+
+                    if (field.name === 'cardNumber' && !this.validateCardNumber(field.value)) {
+                        this.showError(field, error);
+                        isValid = false;
+                    }
+                });
+
+                return isValid;
+            }
+
+            validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            validateCardNumber(number) {
+                return /^\d{16}$/.test(number.replace(/\s/g, ''));
+            }
+
+            showError(field, errorElement) {
+                field.classList.add('error');
+                errorElement.style.display = 'block';
+            }
+
+            hideError(errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+
+        // Inicializar sistema de pagos
+        document.addEventListener('DOMContentLoaded', () => {
+            new PaymentSystem();
+        });
+    </script>
+</body>
+</html>

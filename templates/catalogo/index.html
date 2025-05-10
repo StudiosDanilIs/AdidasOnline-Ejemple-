@@ -1,0 +1,179 @@
+{% extends 'catalogo/base.html' %} 
+{% load static %} 
+{% block content %}
+<!-- Carrusel de imágenes -->
+<div class="carrusel">
+  <img src="{% static 'images/fondo1.jpg' %}" alt="Carrusel 1" />
+  <div class="texto-carrusel">
+    <h2>Bienvenido a Adidas Online</h2>
+    <p>Más que una marca, somos un estilo de vida.</p>
+    <a href="#productos" class="btn">Explorar Productos</a>
+  </div>
+</div>
+
+<!-- Sección de Productos -->
+<div id="productos" class="seccion-productos">
+  <h2>Nuestros Productos</h2>
+  <p>Descubre nuestra amplia variedad de zapatos.</p>
+  <div class="productos-grid">
+    {% for producto in productos %}
+    <div class="producto">
+      <div class="contenedor-imagen">
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" />
+        {% if producto.precio_anterior %}
+          <span class="etiqueta-descuento">Descuento</span>
+        {% endif %}
+      </div>
+      <h3 id="nombre">{{ producto.nombre }}</h3>
+      <p id="descripcion">{{ producto.descripcion }}</p>
+      <div class="precios">
+        <p class="precio-actual">${{ producto.precio_actual }}</p>
+        {% if producto.precio_anterior %}
+          <p class="precio-anterior tachado">${{ producto.precio_anterior }}</p>
+        {% endif %}
+      </div>
+      <button
+        class="ver-mas"
+        data-id="{{ producto.id }}"
+        data-nombre="{{ producto.nombre }}"
+        data-imagen1="{% if producto.imagen1 %}{{ producto.imagen1.url }}{% else %}#{% endif %}"
+        data-imagen2="{% if producto.imagen2 %}{{ producto.imagen2.url }}{% else %}#{% endif %}"
+        data-imagen3="{% if producto.imagen3 %}{{ producto.imagen3.url }}{% else %}#{% endif %}"
+        data-imagen4="{% if producto.imagen4 %}{{ producto.imagen4.url }}{% else %}#{% endif %}"
+      >
+        Ver más fotos
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Modal para más imágenes -->
+<div id="modal-imagenes" class="modal hidden">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modal-titulo"></h2>
+    <div class="modal-images">
+      <button class="arrow prev">&larr;</button>
+      <button class="arrow next">&rarr;</button>
+      <div class="imagenes-container">
+        <img src="" alt="Imagen 1" class="active" />
+        <img src="" alt="Imagen 2" />
+        <img src="" alt="Imagen 3" />
+        <img src="" alt="Imagen 4" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notificación tipo toast -->
+<div id="toast" class="toast hidden">
+  <p>¡Correo registrado exitosamente!</p>
+</div>
+
+<!-- Sección de Newsletter -->
+<div class="seccion-newsletter">
+  <h2>Suscríbete a AdidasOnline</h2>
+  <p>Recibe las últimas novedades y ofertas exclusivas.</p>
+  <form id="formulario-newsletter" class="formulario-newsletter">
+    <input type="email" placeholder="Ingresa tu correo electrónico" required />
+    <button type="submit">Suscribirse</button>
+  </form>
+</div>
+
+<script>
+  // Abrir modal al hacer clic en "Ver más fotos"
+  document.querySelectorAll(".ver-mas").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modal = document.getElementById("modal-imagenes");
+      const modalTitulo = document.getElementById("modal-titulo");
+      const imagenes = document.querySelectorAll(".imagenes-container img");
+
+      // Obtener los datos del producto
+      const nombreProducto = button.getAttribute("data-nombre");
+      const imagen1 = button.getAttribute("data-imagen1");
+      const imagen2 = button.getAttribute("data-imagen2");
+      const imagen3 = button.getAttribute("data-imagen3");
+      const imagen4 = button.getAttribute("data-imagen4");
+
+      // Actualizar el título del modal
+      modalTitulo.textContent = `${nombreProducto}`;
+
+      // Actualizar las imágenes del modal
+      imagenes[0].src = imagen1;
+      imagenes[1].src = imagen2;
+      imagenes[2].src = imagen3;
+      imagenes[3].src = imagen4;
+
+      // Mostrar el modal
+      modal.classList.remove("hidden");
+      modal.classList.add("visible");
+    });
+  });
+
+  // Cerrar modal al hacer clic en la "X"
+  document.querySelector(".modal .close").addEventListener("click", () => {
+    const modal = document.getElementById("modal-imagenes");
+    modal.classList.remove("visible");
+    modal.classList.add("hidden");
+  });
+
+  // Cerrar modal al hacer clic fuera del contenido
+  window.addEventListener("click", (event) => {
+    const modal = document.getElementById("modal-imagenes");
+    if (event.target === modal) {
+      modal.classList.remove("visible");
+      modal.classList.add("hidden");
+    }
+  });
+
+  // Cambiar imágenes con flechas
+  document.querySelectorAll(".arrow").forEach((arrow) => {
+    arrow.addEventListener("click", () => {
+      const images = document.querySelectorAll(".imagenes-container img");
+      let activeIndex = -1;
+
+      // Encontrar la imagen activa
+      images.forEach((img, index) => {
+        if (img.classList.contains("active")) {
+          activeIndex = index;
+          img.classList.remove("active");
+        }
+      });
+
+      // Calcular la siguiente imagen
+      if (arrow.classList.contains("prev")) {
+        activeIndex = (activeIndex - 1 + images.length) % images.length;
+      } else if (arrow.classList.contains("next")) {
+        activeIndex = (activeIndex + 1) % images.length;
+      }
+
+      // Activar la nueva imagen
+      images[activeIndex].classList.add("active");
+    });
+  });
+
+  // Capturar el evento de envío del formulario
+  document.getElementById("formulario-newsletter").addEventListener("submit", function (event) {
+    event.preventDefault(); // Evitar que el formulario se envíe
+
+    // Mostrar el toast
+    const toast = document.getElementById("toast");
+    toast.classList.remove("hidden");
+    toast.classList.add("visible");
+
+    // Limpiar el campo de correo
+    document.querySelector("#formulario-newsletter input[type='email']").value = "";
+
+    // Ocultar el toast después de 3 segundos
+    setTimeout(() => {
+      toast.classList.remove("visible");
+      toast.classList.add("hidden");
+    }, 3000);
+  });
+</script>
+{% endblock %} 
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.0" />
+{% endblock %}

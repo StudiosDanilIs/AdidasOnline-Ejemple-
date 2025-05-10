@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adidas Online</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link
+      rel="shortcut icon"
+      href="{% static 'images/logo.ico' %}"
+      type="image/x-icon"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <!-- Bloque para CSS adicional -->
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Menú de navegación -->
+    <nav class="menu">
+      <div class="logo">
+        <img src="{% static 'images/adidas_logo.png' %}" alt="Adidas Logo" />
+      </div>
+      <div class="opciones">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'categorias' %}">Productos</a>
+        <a href="{% url 'patrocicado' %}">Patrocinados</a>
+        
+        {% if user.is_authenticated %}
+          <!-- Mostrar carrito y menú de usuario -->
+          <a href="{% url 'ver_carrito' %}" class="carrito-icono">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="carrito-contador">..</span>
+          </a>
+          
+          <div class="user-dropdown">
+            <div class="user-info">
+              <span class="username">{{ user.nombre }}</span>
+              <i class="fas fa-caret-down"></i>
+            </div>
+            <ul class="dropdown-menu">
+              <li>
+                <form action="{% url 'perfil' %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="logout-button">
+                    <i class="fa-solid fa-user"></i> Perfil
+                  </button>
+                </form>
+                <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <!-- Mostrar opciones de autenticación -->
+          <a href="{% url 'login' %}" class="login-button">Login/Registro</a>
+        {% endif %}
+        <a href="{% url 'admin:login' %}" class="login-button">Admin</a>
+      </div>
+    </nav>
+
+    <!-- Toast para mensajes -->
+    <div id="toast" class="toast hidden">
+      <p id="toast-message"></p>
+    </div>
+
+    <!-- Bloque para el contenido específico de cada página -->
+    {% block content %}{% endblock %}
+
+    <!-- Pie de página -->
+    <footer>
+      <div class="footer-contenido">
+        <div class="footer-seccion">
+          <h3>Tienda Online</h3>
+          <p>
+            Descubre la excelencia de la mejor marca y vive una experiencia
+            única, ahora más cerca que nunca. Con solo un clic, tienes todo lo
+            que necesitas al alcance de tu mano. Simplificamos tu vida para que
+            disfrutes de lo mejor, cuando y donde quieras.
+          </p>
+        </div>
+        <div class="footer-seccion">
+          <h3>Enlaces Rápidos</h3>
+          <ul>
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+            <li><a href="{% url 'categorias' %}">Productos</a></li>
+            <li><a href="{% url 'patrocicado' %}">Patrocinados</a></li>
+          </ul>
+        </div>
+        <div class="footer-seccion">
+          <h3>Contacto</h3>
+          <p>Email: Adidas@Online.com</p>
+          <p>Teléfono: +58 424-7337211</p>
+          <p>Dirección: San Cristóbal Tachira, VE</p>
+        </div>
+      </div>
+      <div class="footer-copy">
+        &copy; 2025 ADIDAS Online. Todos los derechos reservados. |
+        <a href="{% url 'politica' %}">Política de privacidad</a>
+      </div>
+    </footer>
+
+    <!-- Script de JavaScript -->
+    <script src="{% static 'js/ver_prodcuto.js' %}"></script>
+    <script>
+      // Mostrar toast
+      function showToast(message, type) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        toastMessage.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.classList.remove('hidden');
+
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 5000);
+      }
+
+      // Mostrar mensajes de Django
+      {% if messages %}
+        {% for message in messages %}
+          showToast("{{ message }}", "{{ message.tags }}");
+        {% endfor %}
+      {% endif %}
+    </script>
+  </body>
+</html>

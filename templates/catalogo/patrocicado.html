@@ -1,0 +1,215 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Carrusel de imágenes -->
+<div class="carrusel">
+  <img src="{% static 'images/fondo2.jpg' %}" alt="Carrusel 1" />
+  <div class="texto-carrusel">
+    <h2>Nuestro Mayor orgullo</h2>
+    <p>conoce mas de los que hace grande a Adidas.</p>
+    <a href="#patrocinados" class="btn">Ver Patrocinados</a>
+  </div>
+</div>
+
+<div class="container" id="patrocinados">
+  <!-- Equipos -->
+  <h2 id="titulo">Equipos patrocinados por Adidas</h2>
+  <div class="grid-container">
+    {% for equipo in equipos %}
+    <div class="card">
+      <img
+        src="{{ equipo.imagen }}"
+        alt="{{ equipo.nombre }}"
+        class="modal-trigger"
+        data-modal="modal-{{ forloop.counter }}"
+      />
+      <div class="card-content">
+        <div class="card-title">{{ equipo.nombre }}</div>
+        <div class="card-subtitle">{{ equipo.liga }}</div>
+        <div class="card-description">{{ equipo.descripcion }}</div>
+      </div>
+    </div>
+
+    <!-- Modal para cada equipo -->
+    <div id="modal-{{ forloop.counter }}" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>{{ equipo.nombre }}</h2>
+        <div class="modal-grid">
+          <div class="modal-images">
+            <button class="arrow prev">&larr;</button>
+            <button class="arrow next">&rarr;</button>
+            {% for imagen in equipo.imagenes %}
+            <img
+              src="{{ imagen }}"
+              alt="{{ equipo.nombre }}"
+              class="{% if forloop.first %}active{% endif %}"
+            />
+            {% endfor %}
+          </div>
+          <div class="modal-info">
+            <p>{{ equipo.info_adicional }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Selecciones -->
+  <h2 id="titulo">Selecciones patrocinadas por Adidas</h2>
+  <div class="grid-container">
+    {% for seleccion in selecciones %}
+    <div class="card">
+      <img
+        src="{{ seleccion.imagen }}"
+        alt="{{ seleccion.nombre }}"
+        class="modal-trigger"
+        data-modal="modal-seleccion-{{ forloop.counter }}"
+      />
+      <div class="card-content">
+        <div class="card-title">{{ seleccion.nombre }}</div>
+        <div class="card-subtitle">{{ seleccion.confederacion }}</div>
+        <div class="card-description">{{ seleccion.descripcion }}</div>
+      </div>
+    </div>
+
+    <!-- Modal para cada selección -->
+    <div id="modal-seleccion-{{ forloop.counter }}" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>{{ seleccion.nombre }}</h2>
+        <div class="modal-grid">
+          <div class="modal-images">
+            <button class="arrow prev">&larr;</button>
+            <button class="arrow next">&rarr;</button>
+            {% for imagen in seleccion.imagenes %}
+            <img
+              src="{{ imagen }}"
+              alt="{{ seleccion.nombre }}"
+              class="{% if forloop.first %}active{% endif %}"
+            />
+            {% endfor %}
+          </div>
+          <div class="modal-info">
+            <p>{{ seleccion.info_adicional }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Estrellas -->
+  <h2 id="titulo">Estrellas patrocinadas por Adidas</h2>
+  <div class="grid-container">
+    {% for estrella in estrellas %}
+    <div class="card">
+      <img
+        src="{{ estrella.imagen }}"
+        alt="{{ estrella.nombre }}"
+        class="modal-trigger"
+        data-modal="modal-estrella-{{ forloop.counter }}"
+      />
+      <div class="card-content">
+        <div class="card-title">{{ estrella.nombre }}</div>
+        <div class="card-subtitle">{{ estrella.deporte }}</div>
+        <div class="card-description">{{ estrella.descripcion }}</div>
+      </div>
+    </div>
+
+    <!-- Modal para cada estrella -->
+    <div id="modal-estrella-{{ forloop.counter }}" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>{{ estrella.nombre }}</h2>
+        <div class="modal-grid">
+          <div class="modal-images">
+            <button class="arrow prev">&larr;</button>
+            <button class="arrow next">&rarr;</button>
+            {% for imagen in estrella.imagenes %}
+            <img
+              src="{{ imagen }}"
+              alt="{{ estrella.nombre }}"
+              class="{% if forloop.first %}active{% endif %}"
+            />
+            {% endfor %}
+          </div>
+          <div class="modal-info">
+            <p>{{ estrella.info_adicional }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Script para manejar los modales -->
+<script>
+  // Abrir modal
+  document.querySelectorAll(".modal-trigger").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const modalId = trigger.getAttribute("data-modal");
+      const modal = document.getElementById(modalId);
+      modal.classList.remove("hidden");
+      modal.classList.add("visible");
+
+      // Activar la primera imagen
+      const images = modal.querySelectorAll(".modal-images img");
+      if (images.length > 0) {
+        images[0].classList.add("active");
+      }
+    });
+  });
+
+  // Cerrar modal
+  document.querySelectorAll(".modal .close").forEach((closeBtn) => {
+    closeBtn.addEventListener("click", () => {
+      const modal = closeBtn.closest(".modal");
+      modal.classList.remove("visible");
+      modal.classList.add("hidden");
+    });
+  });
+
+  // Cerrar modal al hacer clic fuera
+  window.addEventListener("click", (event) => {
+    if (event.target.classList.contains("modal")) {
+      event.target.classList.remove("visible");
+      event.target.classList.add("hidden");
+    }
+  });
+
+  // Cambiar imágenes con flechas
+  document.querySelectorAll(".arrow").forEach((arrow) => {
+    arrow.addEventListener("click", () => {
+      const modal = arrow.closest(".modal");
+      const images = modal.querySelectorAll(".modal-images img");
+      let activeIndex = -1;
+
+      // Encontrar la imagen activa
+      images.forEach((img, index) => {
+        if (img.classList.contains("active")) {
+          activeIndex = index;
+          img.classList.remove("active");
+        }
+      });
+
+      // Calcular la siguiente imagen
+      if (arrow.classList.contains("prev")) {
+        activeIndex = (activeIndex - 1 + images.length) % images.length;
+      } else if (arrow.classList.contains("next")) {
+        activeIndex = (activeIndex + 1) % images.length;
+      }
+
+      // Activar la nueva imagen
+      images[activeIndex].classList.add("active");
+    });
+  });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/styles_patrocinado.css' %}?v=1.0" />
+{% endblock %}

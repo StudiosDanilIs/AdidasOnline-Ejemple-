@@ -1,0 +1,248 @@
+/* Menú de navegación */
+.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);;
+  padding: 15px 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1450px;
+  z-index: 3;
+}
+
+.logo img {
+  width: 80px;
+  height: auto;
+}
+
+.opciones {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.opciones a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.opciones a:hover {
+  color: #37a9ff;
+}
+
+/* Ícono del carrito */
+.carrito-icono {
+  position: relative;
+  color: white;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.carrito-icono:hover {
+  color: #37a9ff;
+}
+
+.carrito-contador {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #ff6f61;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+/* Menú desplegable del usuario */
+.user-dropdown {
+  position: relative;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.username {
+  color: white;
+  font-size: 16px;
+}
+
+.user-dropdown:hover .username {
+  color: #37a9ff;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #000;
+  border: 1px solid #37a9ff;
+  border-radius: 4px;
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+  z-index: 1000;
+}
+
+.user-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  transition: color 0.3s ease;
+}
+
+.logout-button:hover {
+  color: #37a9ff;
+}
+
+/* Botones de login y admin */
+.login-button, .admin-button {
+  background-color: #37a9ff;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover, .admin-button:hover {
+  background-color: #2a7bbf;
+}
+
+/* Pie de página */
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 40px 20px;
+  margin-top: 0px;
+}
+
+.footer-contenido {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-seccion {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px 20px;
+}
+
+.footer-seccion h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #ff6f61;
+}
+
+.footer-seccion p,
+.footer-seccion ul {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.footer-seccion ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-seccion ul li {
+  margin-bottom: 8px;
+}
+
+.footer-seccion ul li a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-seccion ul li a:hover {
+  color: #ff6f61;
+}
+
+.footer-copy {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.footer-copy a {
+  color: #ff6f61;
+  text-decoration: none;
+}
+
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 300px; /* Ancho máximo para evitar que sea demasiado ancho */
+  max-height: 20px;
+  word-wrap: break-word; /* Asegura que el texto no se desborde */
+}
+
+.toast.hidden {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.toast:not(.hidden) {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Tipos de toast */
+.toast.success {
+  background-color: #4caf50; /* Verde */
+}
+
+.toast.error {
+  background-color: #f44336; /* Rojo */
+}
+
+.toast.warning {
+  background-color: #ff9800; /* Naranja */
+}
+
+.toast.info {
+  background-color: #2196f3; /* Azul */
+}
+
+/* Estilo del texto dentro del toast */
+#toast-message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}

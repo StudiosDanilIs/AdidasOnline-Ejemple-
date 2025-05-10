@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Adidas Online{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles_login.css' %}" />
+  <link rel="shortcut icon" href="{% static 'images/logo.ico' %}" type="image/x-icon" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <!-- Toastify CSS (para notificaciones) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+  <!-- Menú de navegación -->
+  <nav class="menu">
+    <div class="logo">
+      <img src="{% static 'images/adidas_logo.png' %}" alt="Adidas Logo" />
+    </div>
+    <div class="opciones">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'categorias' %}">Productos</a>
+      <a href="{% url 'patrocicado' %}">Patrocinados</a>
+      <a href="{% url 'admin:login' %}" class="admin-button">Admin</a>
+    </div>
+  </nav>
+
+  <!-- Contenido específico de cada página -->
+  {% block content %}{% endblock %}
+
+  <!-- Toast para mensajes -->
+  <div id="toast" class="toast hidden">
+    <p id="toast-message"></p>
+  </div>
+
+  <!-- Toastify JS (para notificaciones) -->
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    // Mostrar toast
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+
+      toastMessage.textContent = message;
+      toast.className = `toast ${type}`; // Agregar clase de tipo (success, error, etc.)
+      toast.classList.remove('hidden');
+
+      // Ocultar el toast después de 3 segundos
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Mostrar mensajes de Django como toast
+    {% if messages %}
+      {% for message in messages %}
+        showToast("{{ message }}", "{{ message.tags }}");
+      {% endfor %}
+    {% endif %}
+  </script>
+</body>
+</html>

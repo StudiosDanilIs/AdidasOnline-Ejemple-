@@ -1,0 +1,42 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Registro - Adidas Online{% endblock %}
+
+{% block content %}
+  <!-- Contenedor del formulario de registro -->
+  <div class="login-background">
+    <div class="auth-container">
+      <div class="auth-box">
+        <h2>Registro</h2>
+        <form class="auth-form" method="post" action="{% url 'registro' %}">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="form-group">
+            <label for="id_nombre">Nombre de Usuario:</label>
+            {{ form.nombre }}
+            {{ form.nombre.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_email">Correo electrónico:</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_password">Contraseña:</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_confirm_password">Confirmar contraseña:</label>
+            {{ form.confirm_password }}
+            {{ form.confirm_password.errors }}
+          </div>
+          <button type="submit" class="auth-button">Registrarse</button>
+        </form>
+        <div class="auth-links">
+          <a href="{% url 'login' %}">¿Ya tienes una cuenta? Inicia Sesión</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
